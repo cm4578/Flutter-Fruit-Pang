@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:fruit_game/config/global.dart';
 import 'package:fruit_game/page/game_page.dart';
@@ -11,7 +9,7 @@ class StartPage extends StatefulWidget {
   State<StartPage> createState() => _StartPageState();
 }
 
-class _StartPageState extends State<StartPage> with SingleTickerProviderStateMixin {
+class _StartPageState extends State<StartPage> with TickerProviderStateMixin {
 
 
   var isScale = false;
@@ -25,6 +23,7 @@ class _StartPageState extends State<StartPage> with SingleTickerProviderStateMix
 
   List<Animation> fruitAnimList = [];
   late AnimationController controller;
+  late AnimationController fruitController;
 
   final nickNameCon = TextEditingController();
   String? errorString;
@@ -34,20 +33,32 @@ class _StartPageState extends State<StartPage> with SingleTickerProviderStateMix
   @override
   void initState() {
     super.initState();
-    controller = AnimationController(vsync: this,duration: Duration(seconds: 1));
+    controller = AnimationController(vsync: this,duration: Duration(seconds: 1),reverseDuration: Duration(seconds: 1));
+    fruitController = AnimationController(vsync: this,duration: Duration(seconds: 1));
+
+
     fruitAnimList = List.generate(imageList.length, (index) {
       var begin = ((imageList.length - 1) - index) / imageList.length;
-      print(begin);
-      return Tween(begin: 0.0,end: 10.0).animate(CurvedAnimation(parent: controller, curve: Interval(begin, 1.0,curve: Curves.easeInToLinear)));
+      return TweenSequence([
+        TweenSequenceItem(tween: Tween(begin: 0.0,end: 10.0).chain(CurveTween(curve: Interval(begin, 1.0,curve: Curves.easeOut))), weight: 1.0),
+        TweenSequenceItem(tween: Tween(begin: 10.0,end: 0.0).chain(CurveTween(curve: Curves.decelerate)), weight: 1.0),
+      ]).animate(fruitController);
     });
 
     cloudyAnimation = Tween(begin: .0,end: 1.0).animate(controller);
+
 
 
     controller.repeat(reverse: true);
     controller.addListener(() {
       setState(() {});
     });
+
+    fruitController.repeat();
+    fruitController.addListener(() {
+      setState(() {});
+    });
+
     WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((timeStamp) async {
       isScale = true;
       setState(() {});
@@ -77,6 +88,7 @@ class _StartPageState extends State<StartPage> with SingleTickerProviderStateMix
           Opacity(opacity: .2,child: Image.asset('assets/download.png',width: 40,color: Colors.black,),),
           Image.asset('assets/cloud-1.png',width: 40,)
         ],)),
+
 
         Positioned(top: MediaQuery.of(context).size.height / 2,left: 0,right: 0,child: Column(mainAxisSize: MainAxisSize.min,children: [
           const SizedBox(height: 40,),

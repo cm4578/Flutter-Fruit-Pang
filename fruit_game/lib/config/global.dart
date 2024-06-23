@@ -7,8 +7,8 @@ class Global {
   static var boardSize = 400.0;
   static var boardPadding = 5;
 
-  static var dismissAnimDuration = Duration(milliseconds: 500);
-  static var stepAnimDuration = Duration(milliseconds: 800);
+  static var dismissAnimDuration = Duration(milliseconds: 450);
+  static var stepAnimDuration = Duration(milliseconds: 700);
 
 
   static Timer? timer;
